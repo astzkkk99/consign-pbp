@@ -1,7 +1,2 @@
-Nama : Palastha Zhorif Kawiswara
-
-NPM : 2306245705
-
-Kelas : PBP F
-
-CONSIGN!
+Cara saya mengimplementasikan checklist:
+1. Membuat proyek Django baru dengan membuat repo baru di github terlebih dahulu, lalu membuat p
