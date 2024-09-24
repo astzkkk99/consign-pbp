@@ -170,3 +170,25 @@ Cookies memiliki kegunaan lain seperti:
 Tidak semua cookies aman digunakan. Contohnya: 
 - Persistent Cookies: Cookies yang tetap ada meskipun browser ditutup. Jika tidak diatur dengan benar, ini dapat menimbulkan risiko keamanan.
 - Tracking Cookies : Selain menimbulkan masalah privasi, cookies ini dapat diakses oleh penyerang jika tidak dilindungi dengan baik, memungkinkan mereka untuk melacak aktivitas user tanpa izin.
+def show_xml_by_id(request, id):
+    data = MoodEntry.objects.filter(pk=id)
+    return HttpResponse(serializers.serialize("xml", data), content_type="application/xml")
+
+def show_json_by_id(request, id):
+    data = MoodEntry.objects.filter(pk=id)
+    return HttpResponse(serializers.serialize("json", data), content_type="application/json")
+```
+Lalu import kedua fungsi berikut ke urls.py pada main. Dan tambahkan path URL ke urlpatterns:
+```
+path('xml/<str:id>/', show_xml_by_id, name='show_xml_by_id'),
+path('json/<str:id>/', show_json_by_id, name='show_json_by_id'),
+```
+Screenshot Postman
+- XML
+  <img width="1271" alt="xml" src="https://github.com/user-attachments/assets/58f306a6-4240-492c-98d4-04408488c549">
+- JSON
+  <img width="1275" alt="json" src="https://github.com/user-attachments/assets/f4dce31f-797b-4b45-b8e0-eb29c1b14fa5">
+- XML by ID
+  <img width="1275" alt="xml by id" src="https://github.com/user-attachments/assets/f83a518e-b528-4451-ad8a-89df0d0dc9a4">
+- JSON by ID
+  <img width="1271" alt="json by id" src="https://github.com/user-attachments/assets/e3b24420-1a60-47a7-931f-1248f6cb0500">
