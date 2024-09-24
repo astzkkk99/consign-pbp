@@ -2,14 +2,8 @@
 {% block content %}
 <h1>{{ title }}</h1>
 
-<h5>Item Type: </h5>
-<p>{{ item_type }}<p>
-<h5>Name: </h5>
-<p>{{ item_name }}<p>
-<h5>Price (Rp): </h5>
-<p>{{ item_price }}<p>
-<h5>Description: </h5>
-<p>{{ item_description }}<p>
+<h5>Welcome! </h5>
+<p>{{ user_name }}<p>
 
 {% if not item_entries %}
 <p>Belum ada item pada direktori!</p>
@@ -22,8 +16,7 @@
     <th>Description</th>
     </tr>
 
-    {% comment %} Berikut cara memperlihatkan data mood di bawah baris ini 
-    {% endcomment %} 
+    
     {% for item_entry in item_entries %}
     <tr>
     <td>{{item_entry.item_type}}</td>
@@ -40,4 +33,10 @@
 <a href="{% url 'main:create_item_entry' %}">
     <button>Add Item</button>
 </a>
+
+<a href="{% url 'main:logout' %}">
+    <button>Logout</button>
+    <h5>Sesi terakhir login: {{ last_login }}</h5>
+  </a>
+
 {% endblock content %}
