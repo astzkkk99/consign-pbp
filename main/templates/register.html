@@ -1,32 +1,62 @@
 {% extends 'base.html' %}
 
-{% block meta %}
-<title>Register</title>
-{% endblock meta %}
-
 {% block content %}
+<div class="min-h-screen flex items-center justify-center w-screen bg-black-100 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full space-y-8">
+    <div>
+      <h1 class="mt-6 text-center text-black text-3xl font-extrabold text-gray-900">
+        Add New Item Entry
+      </h1>
+    </div>
 
-<div class="login">
-  <h1>Register</h1>
+    <div class="bg-white p-6 rounded-lg shadow-lg border border-gray-300">
+      <form method="POST" class="space-y-6">
+        {% csrf_token %}
 
-  <form method="POST">
-    {% csrf_token %}
-    <table>
-      {{ form.as_table }}
-      <tr>
-        <td></td>
-        <td><input type="submit" name="submit" value="Daftar" /></td>
-      </tr>
-    </table>
-  </form>
+        <!-- Render form fields as a table or as div elements -->
+        <div class="rounded-md shadow-sm -space-y-px">
+          {{ form.non_field_errors }}
+          <div>
+            <label for="item_type" class="sr-only">{{ form.item_type.label }}</label>
+            {{ form.item_type }}
+            {% for error in form.item_type.errors %}
+              <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+            {% endfor %}
+          </div>
 
-  {% if messages %}
-  <ul>
-    {% for message in messages %}
-    <li>{{ message }}</li>
-    {% endfor %}
-  </ul>
-  {% endif %}
+          <div>
+            <label for="item_name" class="sr-only">{{ form.item_name.label }}</label>
+            {{ form.item_name }}
+            {% for error in form.item_name.errors %}
+              <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+            {% endfor %}
+          </div>
+
+          <div>
+            <label for="item_price" class="sr-only">{{ form.item_price.label }}</label>
+            {{ form.item_price }}
+            {% for error in form.item_price.errors %}
+              <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+            {% endfor %}
+          </div>
+
+          <div>
+            <label for="item_description" class="sr-only">{{ form.item_description.label }}</label>
+            {{ form.item_description }}
+            {% for error in form.item_description.errors %}
+              <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Submit button -->
+        <div>
+          <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800">
+            Add New Item
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
-
-{% endblock content %}
+{% endblock %}

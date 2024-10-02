@@ -12,6 +12,8 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import reverse
+
 
 
 @login_required(login_url='/login')
@@ -31,9 +33,9 @@ def create_item_entry(request):
     form  = ItemEntryForm(request.POST or None)
     
     if form.is_valid() and request.method == "POST":
-        mood_entry = form.save(commit=False)
-        mood_entry.user = request.user
-        mood_entry.save()
+        item_entry = form.save(commit=False)
+        item_entry.user = request.user
+        item_entry.save()
         return redirect('main:show_main')
 
     context = {'form': form}
@@ -88,3 +90,26 @@ def logout_user(request):
     response = HttpResponseRedirect(reverse('main:login'))
     response.delete_cookie('last_login')
     return response
+
+def edit_item(request, id):
+    # Get item entry berdasarkan id
+    item = Item.objects.get(pk = id)
+
+    # Set item entry sebagai instance dari form
+    form = ItemEntryForm(request.POST or None, instance=item)
+
+    if form.is_valid() and request.method == "POST":
+        # Simpan form dan kembali ke halaman awal
+        form.save()
+        return HttpResponseRedirect(reverse('main:show_main'))
+
+    context = {'form': form}
+    return render(request, "edit_item.html", context)
+
+def delete_item(request, id):
+    # Get item berdasarkan id
+    mood = Item.objects.get(pk = id)
+    # Hapus item
+    mood.delete()
+    # Kembali ke halaman awal
+    return HttpResponseRedirect(reverse('main:show_main'))
