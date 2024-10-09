@@ -13,17 +13,20 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import reverse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from django.utils.html import strip_tags
 
 
 
 @login_required(login_url='/login')
 def show_main(request):
-    item_entries = Item.objects.filter(user=request.user)
+    # item_entries = Item.objects.filter(user=request.user)
     
     context = {
         'title' : "CONSIGN!",
         'user_name': request.user.username,
-        'item_entries' : item_entries,
+        # 'item_entries' : item_entries,
         'last_login' : request.COOKIES['last_login'],
     }
 
@@ -41,12 +44,30 @@ def create_item_entry(request):
     context = {'form': form}
     return render(request, "create_item_entry.html", context)
 
+@csrf_exempt
+@require_POST
+def add_item_entry_ajax(request):
+    item_type = strip_tags(request.POST.get("item_type"))
+    item_name = strip_tags(request.POST.get("item_name"))
+    item_price = strip_tags(request.POST.get("item_price"))
+    item_description = strip_tags(request.POST.get("item_description"))
+    user = request.user
+
+    new_item = Item(
+        item_type=item_type, item_name=item_name,
+        item_price=item_price, item_description=item_description,
+        user=user
+    )
+    new_item.save()
+
+    return HttpResponse(b"CREATED", status=201)
+
 def show_xml(request):
-    data = Item.objects.all()
+    data = Item.objects.filter(user=request.user)
     return HttpResponse(serializers.serialize("xml", data), content_type="application/xml")
 
 def show_json(request):
-    data = Item.objects.all()
+    data = Item.objects.filter(user=request.user)
     return HttpResponse(serializers.serialize("json", data), content_type="application/json")
 
 def show_xml_by_id(request, id):
@@ -113,3 +134,4 @@ def delete_item(request, id):
     mood.delete()
     # Kembali ke halaman awal
     return HttpResponseRedirect(reverse('main:show_main'))
+

@@ -10,20 +10,20 @@
   <div class="max-w-md w-full space-y-8">
     <div>
       <h1 class="mt-6 text-center text-black text-3xl font-extrabold">
-        Add New Item Entry
+        Add Your New Item!
       </h1>
     </div>
 
     <div class="bg-white p-6 rounded-lg shadow-lg border border-gray-300">
       <form method="POST" class="space-y-6">
-        {% csrf_token %}
-        
+        {% csrf_token %} 
         {% for field in form %}
           <div class="flex flex-col">
             <label for="{{ field.id_for_label }}" class="mb-2 font-semibold text-gray-700">
               {{ field.label }}
             </label>
             <div class="w-full">
+              <div class="bg-white p-2 rounded-lg shadow-lg border border-gray-300">
             {{ field }}
             </div>
             {% if field.help_text %}

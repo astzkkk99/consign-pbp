@@ -1,25 +1,24 @@
 {% extends 'base.html' %}
 {% load static %}
-
 {% block meta %}
-<h1>{{ title }}</h1>
-<h5>Welcome! </h5>
-<p>{{ user_name }}</p>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js"></script>
 {% endblock meta %}
-
-{% block content %}
+{% block content %} 
 {% include 'navbar.html' %}
 
-<!-- If no item entries exist, show a message -->
+{% comment %} <!-- If no item entries exist, show a message -->
 {% if not item_entries %}
-<p>Belum ada item pada direktori!</p>
-{% else %}
-<!-- Start of card layout similar to card_item.html -->
+    <div class="flex flex-col items-center justify-center min-h-[24rem] p-6">
+        <img src="{% static 'image/sedih-banget.png' %}" alt="Sad face" class="w-32 h-32 mb-4"/>
+        <p class="text-center text-gray-600 mt-6">No listed item yet!</p>
+    </div>
+    {% else %}
+
 <div class="bg-white">
   <div class="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
     <h2 class="text-2xl font-bold tracking-tight text-gray-900">Your listed items</h2>
 
-    <!-- Grid layout for the items -->
+    <!-- Grid layout for the items -->  
     <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
       {% for item_entry in item_entries %}
       <div class="group relative break-inside-avoid">
@@ -33,7 +32,7 @@
         <div class="mt-4 flex justify-between">
           <div>
             <h3 class="text-sm text-gray-700">
-              {% comment %} <a href="{% url 'main:item_detail' item_entry.pk %}"> {% endcomment %}
+              <a href="{% url 'main:item_detail' item_entry.pk %}">
                 <span aria-hidden="true" class="absolute inset-0"></span>
                 {{ item_entry.item_name }}
               </a>
@@ -45,12 +44,12 @@
 
         <!-- Edit and Delete buttons -->
         <div class="absolute top-0 -right-4 flex space-x-1">
-          <a href="{% url 'main:edit_item' item_entry.pk %}" class="bg-yellow-500 hover:bg-yellow-600 text-white rounded-full p-2 transition duration-300 shadow-md">
+          <a href="{% url 'main:edit_item' item_entry.pk %}" class="bg-white-500 hover:bg-white-600 text-black rounded-full p-2 transition duration-300 shadow-md">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9" viewBox="0 0 20 20" fill="currentColor">
               <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
             </svg>
           </a>
-          <a href="{% url 'main:delete_item' item_entry.pk %}" class="bg-red-500 hover:bg-red-600 text-white rounded-full p-2 transition duration-300 shadow-md">
+          <a href="{% url 'main:delete_item' item_entry.pk %}" class="bg-white-500 hover:bg-white-600 text-black rounded-full p-2 transition duration-300 shadow-md">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
             </svg>
@@ -62,16 +61,66 @@
   </div>
 </div>
 <!-- End of card layout -->
-{% endif %}
+{% endif %} {% endcomment %}
 
-<br />
+
+<div id="item_entry_cards">
+  <div id="crudModal" tabindex="-1" aria-hidden="true" class="hidden fixed inset-0 z-50 w-full flex items-center justify-center bg-gray-800 bg-opacity-50 overflow-x-hidden overflow-y-auto transition-opacity duration-300 ease-out">
+    <div id="crudModalContent" class="relative bg-white rounded-lg shadow-lg w-5/6 sm:w-3/4 md:w-1/2 lg:w-1/3 mx-4 sm:mx-0 transform scale-95 opacity-0 transition-transform transition-opacity duration-300 ease-out">
+      <!-- Modal header -->
+      <div class="flex items-center justify-between p-4 border-b rounded-t">
+        <h3 class="text-xl font-semibold text-gray-900">
+          Add New Item Entry
+        </h3>
+        <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" id="closeModalBtn">
+          <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+          </svg>
+          <span class="sr-only">Close modal</span>
+        </button>
+      </div>
+      <!-- Modal body -->
+      <div class="px-6 py-4 space-y-6 form-style">
+        <form id="itemEntryForm">
+          <div class="mb-4">
+            <label for="item_name" class="block text-sm font-medium text-gray-700">Name</label>
+            <textarea id="item_name" name="item_name" rows ="2" class="mt-1 block w-full border border-gray-300 rounded-md p-2 hover:border-black-700" placeholder="Enter your item name" required></textarea>
+          </div>
+          <div class="mb-4">
+            <label for="item_type" class="block text-sm font-medium text-gray-700">Type</label>
+            <textarea id="item_type" name="item_type" rows="3" class="mt-1 block w-full h-52 resize-none border border-gray-300 rounded-md p-2 hover:border-black-700" placeholder="Enter your item type" required></textarea>
+          </div>
+          <div class="mb-4">
+            <label for="item_price" class="block text-sm font-medium text-gray-700">Price</label>
+            <input type="number" id="item_price" name="item_price" min="1" max="999999999" class="mt-1 block w-full border border-gray-300 rounded-md p-2 hover:border-black-700" required>
+          </div>
+          <div class="mb-4">
+            <label for="item_description" class="block text-sm font-medium text-gray-700">Type</label>
+            <textarea id="item_description" name="item_description" rows="3" class="mt-1 block w-full h-52 resize-none border border-gray-300 rounded-md p-2 hover:border-black-700" placeholder="Enter your item description" required></textarea>
+          </div>
+        </form>
+      </div>
+      <!-- Modal footer -->
+      <div class="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2 p-6 border-t border-gray-200 rounded-b justify-center md:justify-end">
+        <button type="button" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg" id="cancelButton">Cancel</button>
+        <button type="submit" id="submitItemEntry" form="itemEntryForm" class="bg-black-700 hover:bg-black-600 text-white font-bold py-2 px-4 rounded-lg">Save</button>
+      </div>
+    </div>
+  </div>
+
+</div>
 
 <!-- Add Item button -->
 <a href="{% url 'main:create_item_entry' %}">
-    <button class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800">
-        Add Item
-    </button>
+  <button class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800">
+    Add New Item
+  </button>
 </a>
+
+<button data-modal-target="crudModal" data-modal-toggle="crudModal" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105" onclick="showModal();">
+  Add New Item Entry by AJAX
+</button>
+
 
 <!-- Logout and Last login time -->
 <a href="{% url 'main:logout' %}">
@@ -79,6 +128,126 @@
         Logout
     </button>
 </a>
-<h5>Sesi terakhir login: {{ last_login }}</h5>
+<h5>Last session: {{ last_login }}</h5>
+
+<script>
+  async function getItemEntries() {
+      return fetch("{% url 'main:show_json' %}").then((res) => res.json());
+  }
+
+  // Function to refresh and display the fetched entries
+  async function refreshItemEntries() {
+      document.getElementById("item_entry_cards").innerHTML = "";
+      document.getElementById("item_entry_cards").className = "";
+    
+      const itemEntries = await getItemEntries(); 
+      let htmlString = "";
+      let classNameString = "";
+
+      if (itemEntries.length === 0) {
+          classNameString = "flex flex-col items-center justify-center min-h-[24rem] p-6";
+          htmlString = `
+              <div class="flex flex-col items-center justify-center min-h-[24rem] p-6">
+                  <img src="{% static 'image/sedih-banget.png' %}" alt="Sad face" class="w-32 h-32 mb-4"/>
+                  <p class="text-center text-gray-600 mt-4">No listed item yet!</p>
+              </div>
+          `;
+      } else {
+          classNameString = "columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6 w-full"
+          itemEntries.forEach((item) => {
+              const item_name = DOMPurify.sanitize(item.fields.item_name);
+              const item_type = DOMPurify.sanitize(item.fields.item_type);
+              const item_price = DOMPurify.sanitize(item.fields.item_price);
+              const item_description = DOMPurify.sanitize(item.fields.item_description);
+              
+              htmlString += `
+              <div class="group relative break-inside-avoid">
+                  <div class="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80">
+                      <img src="${item.image_url}" alt="${item.item_name}" class="h-full w-full object-cover object-center lg:h-full lg:w-full">
+                  </div>
+                  <div class="mt-4 flex justify-between">
+                      <div>
+                          <h3 class="text-sm text-gray-700">
+                              <a href="/item_detail/${item.pk}">
+                                  <span aria-hidden="true" class="absolute inset-0"></span>
+                                  ${item.item_name}
+                              </a>
+                          </h3>
+                          <p class="mt-1 text-sm text-gray-500">${item.item_description}</p>
+                      </div>
+                      <p class="text-sm font-medium text-gray-900">$${item.item_price}</p>
+                  </div>
+                  <div class="absolute top-0 -right-4 flex space-x-1">
+                      <a href="/edit_item/${item.pk}" class="bg-white-500 hover:bg-white-600 text-black rounded-full p-2 transition duration-300 shadow-md">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9" viewBox="0 0 20 20" fill="currentColor">
+                              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                          </svg>
+                      </a>
+                      <a href="/delete_item/${item.pk}" class="bg-white-500 hover:bg-white-600 text-black rounded-full p-2 transition duration-300 shadow-md">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9" viewBox="0 0 20 20" fill="currentColor">
+                              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                          </svg>
+                      </a>
+                  </div>
+              </div>
+              `;
+          });
+      }
+
+      document.getElementById("item_entry_cards").className = classNameString;
+      document.getElementById("item_entry_cards").innerHTML = htmlString;
+  }
+
+  
+refreshItemEntries();
+    const modal = document.getElementById('crudModal');
+    const modalContent = document.getElementById('crudModalContent');
+  
+    function showModal() {
+        const modal = document.getElementById('crudModal');
+        const modalContent = document.getElementById('crudModalContent');
+  
+        modal.classList.remove('hidden'); 
+        setTimeout(() => {
+          modalContent.classList.remove('opacity-0', 'scale-95');
+          modalContent.classList.add('opacity-100', 'scale-100');
+        }, 50); 
+    }
+  
+    function hideModal() {
+        const modal = document.getElementById('crudModal');
+        const modalContent = document.getElementById('crudModalContent');
+  
+        modalContent.classList.remove('opacity-100', 'scale-100');
+        modalContent.classList.add('opacity-0', 'scale-95');
+  
+        setTimeout(() => {
+          modal.classList.add('hidden');
+        }, 150); 
+    }
+  
+    document.getElementById("cancelButton").addEventListener("click", hideModal);
+    document.getElementById("closeModalBtn").addEventListener("click", hideModal);
+
+    function addItemEntry() {
+      fetch("{% url 'main:add_item_entry_ajax' %}", {
+        method: "POST",
+        body: new FormData(document.querySelector('#itemEntryForm')),
+      })
+      .then(response => refreshItemEntries())
+  
+      document.getElementById("itemEntryForm").reset(); 
+      document.querySelector("[data-modal-toggle='crudModal']").click();
+  
+      return false;
+    }
+
+document.getElementById("itemEntryForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  addItemEntry();
+})
+
+</script>
+
 
 {% endblock content %}
